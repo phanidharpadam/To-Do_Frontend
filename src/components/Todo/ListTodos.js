@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getTodos, deleteTodo } from "../../features/todosSlice";
+import { getTodos, deleteTodo, clearStatus } from "../../features/todosSlice";
 import { setSnackbar } from "../../features/snackbarSlice";
 import { makeStyles, withStyles, createStyles } from "@material-ui/core/styles";
 import {
@@ -25,6 +25,7 @@ import {
   Toolbar,
   TextField,
   InputAdornment,
+  Box,
 } from "@material-ui/core";
 
 import { useNavigate } from "react-router-dom";
@@ -32,7 +33,6 @@ import {
   Delete as DeleteIcon,
   Edit as EditIcon,
   Search as SearchIcon,
-  Visibility as VisibilityIcon,
 } from "@material-ui/icons";
 
 import { getComparator, stableSort } from "./common";
@@ -56,6 +56,10 @@ const useStyles = makeStyles((theme) => ({
   dialogTitle: {
     backgroundColor: "#3f51b5",
     color: "white",
+  },
+  boxStyles: {
+    display: "flex",
+    justifyContent: "flex-end",
   },
 }));
 
@@ -124,6 +128,7 @@ export default function ListTodos(props) {
           snackbarType: "success",
         })
       );
+      dispatch(clearStatus());
     } else if (todosState.deleteTodoStatus === "rejected") {
       dispatch(
         setSnackbar({
@@ -270,7 +275,12 @@ export default function ListTodos(props) {
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row) => {
                     return (
-                      <StyledTableRow key={row.id}>
+                      <StyledTableRow
+                        key={row.id}
+                        onClick={() => {
+                          navigate(`/viewtodo/${row.id}`);
+                        }}
+                      >
                         <TableCell>{row.title}</TableCell>
                         <TableCell>{row.priority}</TableCell>
                         <TableCell>{row.status}</TableCell>
@@ -281,29 +291,22 @@ export default function ListTodos(props) {
                             <IconButton
                               aria-label="edit"
                               color="primary"
-                              onClick={() => {
+                              onClick={(e) => {
+                                e.stopPropagation();
                                 navigate(`/edittodo/${row.id}`);
                               }}
                             >
                               <EditIcon fontSize="small" />
                             </IconButton>
                           </Tooltip>
-                          <Tooltip title="View" arrow>
-                            <IconButton
-                              aria-label="view"
-                              color="primary"
-                              onClick={() => {
-                                navigate(`/viewtodo/${row.id}`);
-                              }}
-                            >
-                              <VisibilityIcon fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
                           <Tooltip title="Delete" arrow>
                             <IconButton
                               aria-label="delete"
                               color="primary"
-                              onClick={() => handleDialogOpen(row.id)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDialogOpen(row.id);
+                              }}
                             >
                               <DeleteIcon fontSize="small" />
                             </IconButton>
@@ -327,6 +330,16 @@ export default function ListTodos(props) {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Paper>
+      <Box m={3} className={classes.boxStyles}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => navigate("/addtodo")}
+        >
+          Create New
+        </Button>
+      </Box>
+
       <Dialog
         open={open}
         onClose={handleDialogClose}

@@ -69,13 +69,13 @@ export default function TodoForm(props) {
   };
   const [todoFormData, setTodoFormData] = useState(initialState);
   const [errors, setErrors] = useState({});
-  const [open, setOpen] = useState(false);
+  const [backdropOpen, setBackdropOpen] = useState(false);
   const dispatch = useDispatch();
   const todosState = useSelector((state) => state.todos);
   const todosLength = todosState.todos.length;
   const { id } = useParams();
   const navigate = useNavigate();
-  console.log(id);
+
   useEffect(() => {
     newForm
       ? setMenubarTitle("Create ToDo")
@@ -83,6 +83,7 @@ export default function TodoForm(props) {
       ? setMenubarTitle("Update ToDo")
       : setMenubarTitle("View ToDo");
   }, [newForm, editForm, viewForm, setMenubarTitle]);
+
   useEffect(() => {
     const { todos } = todosState;
     if (id && todos.length > 0) {
@@ -151,10 +152,10 @@ export default function TodoForm(props) {
   }, [todosState, dispatch, navigate]);
 
   const handleClose = () => {
-    setOpen(false);
+    setBackdropOpen(false);
   };
   const handleToggle = () => {
-    setOpen(!open);
+    setBackdropOpen(!backdropOpen);
   };
 
   const handleText = ({ target }) => {
@@ -173,8 +174,8 @@ export default function TodoForm(props) {
     const res = str.slice(0, index);
     //console.log(res);
     if (index > 0) {
-      //let formString = res.concat('_bool');
-      //setErrors({ ...errors, [res]: '', [formString]: false });
+      let formString = res.concat("_bool");
+      setErrors({ ...errors, [res]: "", [formString]: false });
       setTodoFormData({
         ...todoFormData,
         [res]: newValue,
@@ -185,6 +186,7 @@ export default function TodoForm(props) {
         [target.closest("div").previousElementSibling.id]: null,
       });
     }
+    console.log(todoFormData);
   };
 
   const handleDateChange = (date) => {
@@ -239,6 +241,11 @@ export default function TodoForm(props) {
       _errors.priority = "Priority is required!";
       flag = true;
     }
+    if (editForm && todoFormData.status == null) {
+      _errors.status_bool = true;
+      _errors.status = "Status is required!";
+      flag = true;
+    }
     return { flag, _errors };
   };
   return (
@@ -291,7 +298,13 @@ export default function TodoForm(props) {
                   fullWidth
                   disabled={editForm ? false : true}
                   renderInput={(params) => (
-                    <TextField {...params} label="Status" variant="outlined" />
+                    <TextField
+                      {...params}
+                      label="Status"
+                      variant="outlined"
+                      error={errors?.status_bool}
+                      helperText={errors?.status}
+                    />
                   )}
                 />
               </Grid>
@@ -395,7 +408,11 @@ export default function TodoForm(props) {
           </Grid>
         </Paper>
       </Paper>
-      <Backdrop className={classes.backdrop} open={open} onClick={handleClose}>
+      <Backdrop
+        className={classes.backdrop}
+        open={backdropOpen}
+        onClick={handleClose}
+      >
         <CircularProgress color="inherit" />
       </Backdrop>
     </>

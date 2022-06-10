@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { Card, Grid } from "@material-ui/core";
+import React, { useState, useEffect } from "react";
+import { Card, Grid, Backdrop, CircularProgress } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { getTodosReport } from "../../features/todosSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -10,11 +10,16 @@ const useStyles = makeStyles((theme) => ({
   root: {
     padding: theme.spacing(3),
   },
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: "#fff",
+  },
 }));
 
 export default function Reports(props) {
   const classes = useStyles();
   const dispatch = useDispatch();
+  const [backdropOpen, setBackdropOpen] = useState(true);
   const { setMenubarTitle } = props;
   const todosState = useSelector((state) => state.todos);
   const { reportData } = todosState;
@@ -29,6 +34,16 @@ export default function Reports(props) {
   useEffect(() => {
     dispatch(getTodosReport());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (todosState.getTodosReportStatus === "success") {
+      setBackdropOpen(false);
+    } else if (todosState.getTodosReportStatus === "rejected") {
+      alert("Error");
+      setBackdropOpen(false);
+      console.log(todosState.getTodosReportError);
+    }
+  }, [todosState]);
 
   return (
     <div className={classes.root}>
@@ -64,6 +79,9 @@ export default function Reports(props) {
           </Card>
         </Grid>
       </Grid>
+      <Backdrop className={classes.backdrop} open={backdropOpen}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </div>
   );
 }

@@ -5,7 +5,6 @@ import { makeStyles } from "@material-ui/core/styles";
 import todo from "../assets/images/todo.jpg";
 import SignIn from "./SignIn";
 import SignUp from "./SignUp";
-import { useSelector } from "react-redux";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -13,11 +12,6 @@ const useStyles = makeStyles((theme) => ({
   },
   image: {
     backgroundImage: `url(${todo})`,
-    backgroundRepeat: "no-repeat",
-    backgroundColor:
-      theme.palette.type === "light"
-        ? theme.palette.grey[50]
-        : theme.palette.grey[900],
     backgroundSize: "cover",
     backgroundPosition: "center",
   },
@@ -62,10 +56,6 @@ function Copyright() {
 export default function Home() {
   const classes = useStyles();
   const [signInForm, setSignInForm] = useState(true);
-
-  const auth = useSelector((state) => state.auth);
-
-  console.log(auth);
 
   return (
     <Grid container component="main" className={classes.root}>

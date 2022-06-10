@@ -77,7 +77,6 @@ function SignUp(props) {
 
     const { flag, _errors } = validateFormData();
     if (!flag) {
-      console.log(signUpFormData);
       dispatch(registerUser(signUpFormData));
     } else setErrors(_errors);
   };

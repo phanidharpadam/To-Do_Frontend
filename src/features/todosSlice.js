@@ -36,7 +36,6 @@ export const createTodo = createAsyncThunk(
         },
       };
       let response = await axios.post(`${url}/todos`, bodyParameters, config);
-      console.log(response);
       return response?.data?.data;
     } catch (error) {
       console.log(error.response);
@@ -54,13 +53,13 @@ export const getTodos = createAsyncThunk(
         headers: { Authorization: `Bearer ${token}` },
       };
       let response = await axios.get(`${url}/todos`, config);
-      console.log(response);
+
       const { data } = response.data;
       const newResponse = data.map((todo) => {
         todo.attributes.id = todo.id;
         return todo.attributes;
       });
-      console.log("NewResponse - ", newResponse);
+
       return newResponse;
     } catch (error) {
       console.log(error);
@@ -87,14 +86,13 @@ export const updateTodo = createAsyncThunk(
           dueDate: todo.dueDate,
         },
       };
-      console.log("body", bodyParameters);
-      console.log(_id);
+
       let response = await axios.put(
         `${url}/todos/${_id}`,
         bodyParameters,
         config
       );
-      console.log(response);
+
       return response?.data?.data;
     } catch (error) {
       console.log(error.response);
@@ -112,7 +110,7 @@ export const deleteTodo = createAsyncThunk(
         headers: { Authorization: `Bearer ${token}` },
       };
       let response = await axios.delete(`${url}/todos/${id}`, config);
-      console.log(response);
+
       const { data } = response.data;
       return data;
     } catch (error) {
@@ -131,9 +129,9 @@ export const getTodosReport = createAsyncThunk(
         headers: { Authorization: `Bearer ${token}` },
       };
       let response = await axios.get(`${url}/todos-report`, config);
-      console.log(response);
+
       const { data } = response;
-      console.log(data);
+
       return data;
     } catch (error) {
       console.log(error);
@@ -145,7 +143,23 @@ export const getTodosReport = createAsyncThunk(
 const todosSlice = createSlice({
   name: "todos",
   initialState,
-  reducers: {},
+  reducers: {
+    clearStatus: (state, action) => {
+      return {
+        ...state,
+        addTodoStatus: "",
+        addTodoError: "",
+        getTodoStatus: "",
+        getTodoError: "",
+        updateTodoStatus: "",
+        updateTodoError: "",
+        deleteTodoStatus: "",
+        deleteTodoError: "",
+        getTodosReportStatus: "",
+        getTodosReportError: "",
+      };
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(createTodo.pending, (state, action) => {
       return {
@@ -166,7 +180,7 @@ const todosSlice = createSlice({
       if (action.payload) {
         const { attributes, id } = action.payload;
         attributes.id = id;
-        //console.log("attributes - ", attributes);
+
         return {
           ...state,
           todos: [attributes, ...state.todos],
@@ -392,7 +406,7 @@ const todosSlice = createSlice({
         ...state,
         addTodoStatus: "",
         addTodoError: "",
-        getTodoStatus: "rejected",
+        getTodoStatus: "",
         getTodoError: "",
         updateTodoStatus: "",
         updateTodoError: "",
@@ -404,5 +418,7 @@ const todosSlice = createSlice({
     });
   },
 });
+
+export const { clearStatus } = todosSlice.actions;
 
 export default todosSlice.reducer;

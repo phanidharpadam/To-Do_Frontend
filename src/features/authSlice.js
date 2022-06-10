@@ -24,7 +24,7 @@ export const registerUser = createAsyncThunk(
         email: user.email,
         password: user.password,
       });
-      console.log(response);
+
       return response.data;
     } catch (error) {
       console.log(error.response.data);

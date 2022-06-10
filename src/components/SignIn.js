@@ -32,7 +32,6 @@ function SignIn(props) {
     event.preventDefault();
     const { flag, _errors } = validateFormData();
     if (!flag) {
-      console.log(signInFormData);
       dispatch(loginUser(signInFormData));
     } else setErrors(_errors);
   };
